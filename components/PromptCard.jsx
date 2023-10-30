@@ -15,6 +15,9 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
             setCopied('')
         }, 3000);
     }
+    const directToProfile = (id) => {
+        router.push(`profile/${id}`)
+    }
     return (
         <div className="prompt_card">
             <div className="flex justify-between items-start gap-5">
@@ -23,7 +26,8 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
                         src={post?.creator.image}
                         width={40}
                         height={40}
-                        className="rounded-full object-contain" />
+                        className="rounded-full object-contain"
+                        onClick={() => directToProfile(post?.creator._id)} />
                 </div>
                 <div className="flex flex-col">
                     <h3 className="font-satoshi font-semibold text-gray-900">

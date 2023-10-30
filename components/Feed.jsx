@@ -15,9 +15,34 @@ const PromptCardList = ({ data, handleTagClick }) => {
 }
 const Feed = () => {
     const [searchText, setSearchText] = useState('')
+    const [searchTimeout, setSearchTimeout] = useState(null)
+    const [searchResults, setSearchResults] = useState([])
     const [posts, setPosts] = useState([])
-    const handleSearchChange = (e) => {
+    // Tra ve ket qua khop voi chuoi tim kiem
+    const filteredItems = (searchText) => {
+        const regex = new RegExp(searchText, "i"); // Khong phan biet chu hoa, chu thuong
+        return posts.filter(item =>
+            regex.test(item?.creator.username) ||
+            regex.test(item?.prompt) ||
+            regex.test(item?.tag))
+    }
 
+    const handleSearchChange = (e) => {
+        clearTimeout(searchTimeout)
+        setSearchText(e.target.value)
+
+        // debounce method
+        setSearchTimeout(() => {
+            setTimeout(() => {
+                const searchResult = filteredItems(searchText)
+                setSearchResults(searchResult)
+            }, 500)
+        })
+    }
+    const handleTagClick = (tag) => {
+        setSearchText(tag);
+        const searchResult = filteredItems(tag)
+        setSearchResults(searchResult)
     }
 
     // Fetch all posts
@@ -32,19 +57,32 @@ const Feed = () => {
 
     return (
         <section className="feed">
-            <form className="relative w-full flex-center">
+            <form onSubmit={(e) => e.preventDefault()} className="relative w-full flex-center">
                 <input
                     type="text"
                     placeholder="Search for a tag or a user name"
                     value={searchText}
-                    onChange={handleSearchChange}
+                    onChange={(e) => handleSearchChange(e)}
                     required
-                    className="search_input peer" />
+                    className="search_input peer"
+                />
             </form>
-            <PromptCardList
-                data={posts}
-                handleTagClick={() => { }}
-            />
+            {
+                searchText ?
+                    (
+                        <PromptCardList
+                            data={searchResults}
+                            handleTagClick={handleTagClick}
+                        />
+                    ) :
+                    (
+                        <PromptCardList
+                            data={posts}
+                            handleTagClick={handleTagClick}
+                        />
+                    )
+            }
+
         </section>
     )
 }
